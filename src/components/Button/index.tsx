@@ -6,11 +6,12 @@ type ButtonProps = TouchableOpacityProps & {
     isLoading?: boolean;
 }
 
-export const Button = ({ title, isLoading=false }:ButtonProps)=>{
+export const Button = ({ title, isLoading=false, ...rest }:ButtonProps)=>{
     return (
         <Container
             activeOpacity={0.7}
             disabled={isLoading}
+            {...rest}
             >
             {isLoading ? 
                 <LoadingIndicator /> 

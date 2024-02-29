@@ -21,6 +21,7 @@ export const ButtonText = styled.Text`
 `
 
 
-export const LoadingIndicator = styled.ActivityIndicator`
-    color: ${({theme})=> theme.COLORS.BRAND_LIGHT}
-`
+export const LoadingIndicator = styled.ActivityIndicator.attrs(({theme})=>({
+    color:theme.COLORS.WHITE
+    
+}))``
