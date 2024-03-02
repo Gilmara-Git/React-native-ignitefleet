@@ -11,7 +11,6 @@ import { IOS_CLIENT_ID, WEB_CLIENT_ID }  from '@env';
 
 import { Realm, useApp } from '@realm/react'; 
 
-
 GoogleSignin.configure({
     scopes:['email','profile'],
     webClientId: WEB_CLIENT_ID,
