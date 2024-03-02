@@ -1,11 +1,15 @@
-import  { Container, Title } from './styles';
+import  { Container } from './styles';
+import { Header } from '../../components/Header'
+
 
 export const Home = ()=>{
+
+
+
     return (
-        <Container>
-            <Title>
-                home page
-            </Title>
+        <Container >
+          <Header />
+          
         </Container>
     )
 };

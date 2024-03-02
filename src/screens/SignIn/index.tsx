@@ -6,9 +6,10 @@ import backgroundImg from '../../assets/background.png';
 
 import { Button } from '../../components/Button';
 
-import { statusCodes, GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { IOS_CLIENT_ID, WEB_CLIENT_ID }  from '@env';
 
+import { Realm, useApp } from '@realm/react'; 
 
 GoogleSignin.configure({
     scopes:['email','profile'],
@@ -19,15 +20,27 @@ GoogleSignin.configure({
 
 export const SignIn = ()=>{
     const [isAuthenticating, setIsAuthenticating ] = useState(false);
+    const app = useApp();
 
     const handleGoogleSignIn = async()=>{
-        console.log( 'I was clicked')
+       
         try{
             setIsAuthenticating(true);
 
             const { idToken } =  await GoogleSignin.signIn();
-            console.log(idToken)
-           
+        
+            if(idToken){
+
+                const credentials = Realm.Credentials.jwt(idToken);
+                
+                app.logIn(credentials)
+
+            }else{
+                Alert.alert(
+                    'Login?',
+                    'Sorry, we could not connect with your Google account at the moment. Please try again'
+                    );
+            }
     
     
         }catch(error){
