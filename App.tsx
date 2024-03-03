@@ -1,4 +1,3 @@
-
 import { StatusBar  } from 'react-native';
 import {  SafeAreaProvider } from 'react-native-safe-area-context';
 import theme from './src/theme';
@@ -10,6 +9,7 @@ import { Loading } from './src/components/Loading';
 import { Routes } from './src/routes';
 
 import { AppProvider , UserProvider } from '@realm/react';
+import { RealmProvider } from './src/libs/realm';
 
 // REALM_APP_ID is Application ID inside MongoDB (App Service > Application > App ID)
 import { REALM_APP_ID } from '@env';
@@ -39,7 +39,9 @@ export default function App() {
           translucent
           />
         <UserProvider fallback={ <SignIn/>}>
-          <Routes />
+          <RealmProvider>
+            <Routes />
+          </RealmProvider>
         </UserProvider>
        
       </SafeAreaProvider>
