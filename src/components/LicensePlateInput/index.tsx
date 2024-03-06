@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { Container , Label, PlateNumber } from './styles';
 import { TextInputProps } from 'react-native';
 import { useTheme } from 'styled-components/native';
@@ -20,10 +20,10 @@ export const LicensePlateInput = ({ label, ...rest }: LicensePlateInputProps) =>
         </Label>
 
         <PlateNumber 
-            autoCapitalize='characters'
             maxLength={7}
+            autoCapitalize='characters'
             placeholderTextColor={COLORS.GRAY_400}
-        {...rest}
+            {...rest}
         />
 
     </Container>
