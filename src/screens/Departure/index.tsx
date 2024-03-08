@@ -1,5 +1,5 @@
 import React , { useState , useRef } from 'react';
-import { TextInput, ScrollView, KeyboardAvoidingView , Platform } from 'react-native';
+import { TextInput, ScrollView, KeyboardAvoidingView , Platform , Alert } from 'react-native';
 
 import { Container, Content  } from './styles';
 
@@ -7,17 +7,65 @@ import { CheckOutInHeader } from '../../components/CheckOutInHeader';
 import { LicensePlateInput } from '../../components/LicensePlateInput';
 import { DescriptionArea } from '../../components/DescriptionArea';
 import { Button } from '../../components/Button';
+import { licensePlateValidation } from '../../utils/licensePlateValidation';
+
+import { useRealm } from '../../libs/realm';
+import { Historic } from '../../libs/realm/schemas/Historic';
+import { useUser } from '@realm/react';
+import { useNavigation } from '@react-navigation/native';
 
 
 export function Departure() {
     const [ licensePlate, setLicensePlate ] = useState('');
     const [ description, setDescription ] = useState('');
+    const [ isRegistering, setIsRegistering ] = useState(false);
+
     const descriptionAreaRef = useRef<TextInput>(null);
+    const licensePlateRef = useRef<TextInput>(null);
+
+    const realm = useRealm();
+    const user = useUser();
+    const { goBack} = useNavigation();
+   
 
     const keyboardAvoidBehavior = Platform.OS === 'android' ? 'height': 'position';
 
     const handleCarPickUp = () =>{
-        console.log('ready to pick up car')
+
+      try{
+        if(!licensePlateValidation(licensePlate)){
+          licensePlateRef.current?.focus();
+          return Alert.alert('You have entered an invalid license plate format.')
+        }
+        
+        //description.trim().length === 0 is another way to validate the description
+        if(!description.trim()){
+          return Alert.alert('Inform Purpose','Explain the reason you need this car.')
+        }
+        
+        setIsRegistering;(true)
+    
+
+        realm.write(()=> {
+          realm.create('Historic', Historic.generate({ 
+            user_id: user!.id, 
+            license_plate: licensePlate, 
+            description}) 
+            );
+        });
+
+        Alert.alert('Congratulations','Car pick up was successfully registered.');
+        goBack();
+        
+
+       }catch(error){
+
+        console.log(error);
+        Alert.alert('Error.','It was not possible to register your car pick up.');
+
+       }finally{
+        setIsRegistering(false);
+       }
     };
 
   return (
@@ -27,10 +75,11 @@ export function Departure() {
           <ScrollView>
             <Content>
               <LicensePlateInput
+                ref={licensePlateRef}
                 value={licensePlate}
                 onChangeText={setLicensePlate}
                 label="License Plate"
-                placeholder="USYI897"
+                placeholder="USY8L97"
                 onSubmitEditing={() => descriptionAreaRef.current?.focus()}
                 returnKeyType="next"
               />
@@ -48,7 +97,11 @@ export function Departure() {
             
           
             
-              <Button title="Register Pick up" onPress={handleCarPickUp} />
+              <Button 
+                title="Register Pick up" 
+                onPress={handleCarPickUp}
+                isLoading={isRegistering}
+                />
             </Content>
             </ScrollView>
       </KeyboardAvoidingView>
