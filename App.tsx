@@ -1,3 +1,4 @@
+import 'react-native-get-random-values'; // this to generate id with UUID()
 import { StatusBar  } from 'react-native';
 import {  SafeAreaProvider } from 'react-native-safe-area-context';
 import theme from './src/theme';
