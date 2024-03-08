@@ -1,6 +1,6 @@
-import React  from 'react';
+import React, { forwardRef  }  from 'react';
 import { Container , Label, PlateNumber } from './styles';
-import { TextInputProps } from 'react-native';
+import { TextInputProps, TextInput  } from 'react-native';
 import { useTheme } from 'styled-components/native';
 
 type LicensePlateInputProps = TextInputProps & {
@@ -8,7 +8,7 @@ type LicensePlateInputProps = TextInputProps & {
 };
 
 
-export const LicensePlateInput = ({ label, ...rest }: LicensePlateInputProps) => {
+export const LicensePlateInput = forwardRef<TextInput,LicensePlateInputProps >(({ label, ...rest }, ref) => {
  
     const { COLORS } = useTheme();
     
@@ -20,6 +20,7 @@ export const LicensePlateInput = ({ label, ...rest }: LicensePlateInputProps) =>
         </Label>
 
         <PlateNumber 
+            ref={ref}
             maxLength={7}
             autoCapitalize='characters'
             placeholderTextColor={COLORS.GRAY_400}
@@ -28,4 +29,4 @@ export const LicensePlateInput = ({ label, ...rest }: LicensePlateInputProps) =>
 
     </Container>
   );
-}
+})
