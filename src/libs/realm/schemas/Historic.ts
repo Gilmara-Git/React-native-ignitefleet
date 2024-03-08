@@ -8,13 +8,13 @@ type GenerateProps = {
 }
 
 export class Historic extends Realm.Object<Historic> {
-    _id!: string;
+    _id!: object;
     user_id!: string;
     license_plate!: string;
     description!: string;
     status!: string;
-    created_at!: string;
-    updated_at!: string;
+    created_at!: Date;
+    updated_at!: Date;
 
 
 
@@ -26,7 +26,7 @@ export class Historic extends Realm.Object<Historic> {
             description,
             status: 'departure',
             created_at: new Date(),
-            updated_ad: new Date()
+            updated_at: new Date()
 
         }
 
