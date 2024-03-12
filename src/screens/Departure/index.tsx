@@ -1,5 +1,5 @@
 import React , { useState , useRef } from 'react';
-import { TextInput, ScrollView, KeyboardAvoidingView , Platform , Alert } from 'react-native';
+import { TextInput, ScrollView, Alert } from 'react-native';
 
 import { Container, Content  } from './styles';
 
@@ -13,6 +13,7 @@ import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 
 
 export function Departure() {
@@ -27,8 +28,6 @@ export function Departure() {
     const user = useUser();
     const { goBack} = useNavigation();
    
-
-    const keyboardAvoidBehavior = Platform.OS === 'android' ? 'height': 'position';
 
     const handleCarPickUp = () =>{
 
@@ -71,7 +70,7 @@ export function Departure() {
   return (
     <Container>
       <CheckOutInHeader title="Pick Up" />
-      <KeyboardAvoidingView style={{ flex:1 }} behavior={keyboardAvoidBehavior}>
+      <KeyboardAwareScrollView extraHeight={100}>
           <ScrollView>
             <Content>
               <LicensePlateInput
@@ -83,6 +82,7 @@ export function Departure() {
                 onSubmitEditing={() => descriptionAreaRef.current?.focus()}
                 returnKeyType="next"
               />
+              
 
               <DescriptionArea
                 ref={descriptionAreaRef}
@@ -104,7 +104,7 @@ export function Departure() {
                 />
             </Content>
             </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </Container>
   );
 }
