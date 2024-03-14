@@ -3,6 +3,7 @@ import { Alert , FlatList } from "react-native";
 import { Container, Content, Title, Label } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery, useRealm } from "../../libs/realm";
+import { useUser } from "@realm/react";
 import { Historic } from "../../libs/realm/schemas/Historic";
 
 import { Header } from "../../components/Header";
@@ -20,6 +21,7 @@ export const Home = () => {
   const { navigate } = useNavigation();
 
   const realm = useRealm();
+  const user = useUser();
   const historic = useQuery(Historic);
 
   const fetchHistoricOfCarInUse = () => {
@@ -91,6 +93,16 @@ export const Home = () => {
       }
     };
   }, []);
+
+// adding subscription to use Flexible synchronization with MongoDB, informing the user.id
+useEffect(()=>{
+  realm.subscriptions.update((mutableSubs, realm)=>{
+    const historicByUserQuery = realm.objects('Historic').filtered(`user_id =  '${user!.id}'`);
+
+    mutableSubs.add(historicByUserQuery, {name: 'historic_by_user'});
+  })
+
+},[realm])
 
   return (
     <Container>

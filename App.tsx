@@ -10,7 +10,7 @@ import { Loading } from './src/components/Loading';
 import { Routes } from './src/routes';
 
 import { AppProvider , UserProvider } from '@realm/react';
-import { RealmProvider } from './src/libs/realm';
+import { RealmProvider, syncConfig } from './src/libs/realm';
 
 // REALM_APP_ID is Application ID inside MongoDB (App Service > Application > App ID)
 import { REALM_APP_ID } from '@env';
@@ -40,7 +40,7 @@ export default function App() {
           translucent
           />
         <UserProvider fallback={ <SignIn/>}>
-          <RealmProvider>
+          <RealmProvider fallback={Loading} sync={syncConfig}>
             <Routes />
           </RealmProvider>
         </UserProvider>
