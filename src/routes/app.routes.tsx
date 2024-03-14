@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home } from '../screens/Home';
-import { Departure } from '../screens/Departure'
+import { Departure } from '../screens/Departure';
+import { Arrival } from '../screens/Arrival';
 
 
 // animation: 'fade_from_bottom' to prevent white flash screen to appear when navigation to other pages/screens
@@ -24,6 +25,11 @@ export const AppRoutes = ()=>{
                 component={Departure}    
                 />
 
+
+            <Screen 
+                name='arrival'
+                component={Arrival}    
+                />
 
         </Navigator>
     )

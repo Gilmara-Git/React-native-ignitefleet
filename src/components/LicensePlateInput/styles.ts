@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { TextInput } from 'react-native';
 
 export const Container = styled.View`
   width: 100%;
@@ -15,7 +16,7 @@ export const Label =  styled.Text`
 `;
 
 
-export const PlateNumber = styled.TextInput`
+export const PlateNumber = styled(TextInput)`
     text-align: center;
     margin-top: 16px;
     font-size: ${({theme})=>theme.FONT_SIZE.XXXL}px;
