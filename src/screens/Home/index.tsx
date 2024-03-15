@@ -2,20 +2,26 @@ import { useEffect, useState } from "react";
 import { Alert , FlatList } from "react-native";
 import { Container, Content, Title, Label } from "./styles";
 import { useNavigation } from "@react-navigation/native";
-import { useQuery, useRealm } from "../../libs/realm";
 import { useUser } from "@realm/react";
 import { Historic } from "../../libs/realm/schemas/Historic";
+import { useQuery, useRealm } from "../../libs/realm";
+import { Realm } from '@realm/react';
 
 import { Header } from "../../components/Header";
 import { CarStatus } from "../../components/CarStatus";
 import { HistoricCard , HistoricCardProps } from "../../components/HistoricCard";
-
+import { saveLastSyncTimestamp, getLastSyncTimestamp } from "../../libs/storage/sync";
+import Toast from 'react-native-toast-message';
+import { TopMessage } from '../../components/TopMessage';
 
 import dayjs from "dayjs";
+import { CloudArrowUp } from "phosphor-react-native";
+
 
 export const Home = () => {
   const [vehicleInUse, setVehicleInUse] = useState<Historic | null>(null);
   const  [ vehiclesReturned, setVehiclesReturned ] = useState<HistoricCardProps[]>([]);
+  const  [percentageToSync, setPercentageToSync ] = useState<string | null>(null);
 
 
   const { navigate } = useNavigation();
@@ -30,7 +36,7 @@ export const Home = () => {
       setVehicleInUse(vehicle);
     } catch (error) {
       console.log(error);
-      Alert.alert("Error", "It was not possible to load up vehicle in use.");
+      // Alert.alert("Alert", "No vehicle in use found.");
     }
   };
 
@@ -42,20 +48,21 @@ export const Home = () => {
     }
   };
 
-  const fetchVehicleUsageHistoric = () => {
+  const fetchVehicleUsageHistoric = async() => {
 
     try{
+      const lastTimeDataSynced = await getLastSyncTimestamp();
 
       const historicList = historic.filtered(
         "status = 'arrival' SORT(created_at DESC)"
       );
   
-      const formattedUsedVehicles = historicList.map((item)=>{
+      const formattedUsedVehicles = historicList.map((item)=>{ 
           return {
           id: item._id.toString(),
           licensePlate: item.license_plate,
           created: dayjs(item.created_at).format('[Departured on] MM-DD-YYYY [at] hh:mm A'),
-          isSynced: false
+          isSynced: item.updated_at.getTime() < lastTimeDataSynced!
         }
   
       });
@@ -64,13 +71,37 @@ export const Home = () => {
     }catch(error){
       
       console.log(error);
-      Alert.alert('Error','There was an error to load the Vehicle Usage history.')
+      Alert.alert('Historic','It was not possible to load the Vehicle Usage history.')
     }
     };
   
   const handleHistoricDetails = (id: string)=>{
     navigate('arrival', { historic_id: id})
   };
+
+  const progressNotification = async (transferred: number, transferable: number)=>{
+    //doc shows this way
+    const percentTransferred = 
+    parseFloat((transferred / transferable).toFixed(2)) * 100;
+
+    if(percentTransferred === 100){
+      await saveLastSyncTimestamp();
+      await fetchVehicleUsageHistoric();
+      setPercentageToSync(null);
+
+      Toast.show({
+        type: 'info',
+        text1: `All Data has synchronized successfully.`,
+      })
+    
+   }
+    // Rodrigo did this way
+    // const percentage = (transferred / transferable) * 100;
+
+    if(percentTransferred < 100){
+      setPercentageToSync(`${percentTransferred}% synchronized.`);
+    }
+  }
 
   useEffect(() => {
     fetchVehicleUsageHistoric();
@@ -102,10 +133,31 @@ useEffect(()=>{
     mutableSubs.add(historicByUserQuery, {name: 'historic_by_user'});
   })
 
-},[realm])
+},[realm]);
+
+useEffect(()=>{
+  const syncSession = realm.syncSession;
+  
+  if(!syncSession){
+    return
+  };
+
+  syncSession.addProgressNotification(
+    Realm.ProgressDirection.Upload,
+    Realm.ProgressMode.ReportIndefinitely,
+    progressNotification
+  )
+
+}, []);
+
 
   return (
     <Container>
+
+        { percentageToSync && 
+          <TopMessage  title={percentageToSync} icon={CloudArrowUp}/> 
+        }
+
       <Header />
       <Content>
         <CarStatus

@@ -1,25 +1,32 @@
-import React , { useState , useRef } from 'react';
+import React , { useState , useRef, useEffect  } from 'react';
 import { TextInput, ScrollView, Alert } from 'react-native';
 
-import { Container, Content  } from './styles';
+import { Container, Content , Message } from './styles';
 
 import { CheckOutInHeader } from '../../components/CheckOutInHeader';
 import { LicensePlateInput } from '../../components/LicensePlateInput';
 import { DescriptionArea } from '../../components/DescriptionArea';
 import { Button } from '../../components/Button';
+import { Loading } from '../../components/Loading';
 import { licensePlateValidation } from '../../utils/licensePlateValidation';
+import { getAddressLocation } from '../../utils/getAddressLocation';
 
 import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import { useForegroundPermissions, watchPositionAsync, LocationAccuracy, LocationSubscription } from 'expo-location';
+
 
 
 export function Departure() {
-    const [ licensePlate, setLicensePlate ] = useState('');
-    const [ description, setDescription ] = useState('');
-    const [ isRegistering, setIsRegistering ] = useState(false);
+  const [ licensePlate, setLicensePlate ] = useState('');
+  const [ description, setDescription ] = useState('');
+  const [ isRegistering, setIsRegistering ] = useState(false);
+  const [ isLoadingLocation, setIsLoadingLocation ] = useState(true);
+  
+  const [locationForegroundPermission, requestLocationForegroundPermission ] = useForegroundPermissions();
 
     const descriptionAreaRef = useRef<TextInput>(null);
     const licensePlateRef = useRef<TextInput>(null);
@@ -67,6 +74,58 @@ export function Departure() {
        }
     };
 
+    useEffect(()=>{
+      requestLocationForegroundPermission()
+    },[]);
+    
+    useEffect(()=>{
+
+      if(!locationForegroundPermission?.granted){
+        return;
+      }
+
+      let subscription: LocationSubscription = { remove: ()=>{}} ;
+   
+
+      watchPositionAsync({
+        accuracy: LocationAccuracy.High,
+        timeInterval: 1000
+      }, (location)=>{
+        console.log(location.coords.longitude)
+        getAddressLocation(location.coords)
+        .then((address)=> {
+          console.log(address)
+        })
+        .finally(()=> setIsLoadingLocation(false)); 
+      })
+      .then((response) => subscription = response );
+      
+      return ()=>{
+          if(subscription){
+            subscription.remove();
+
+          }
+      }; 
+
+
+    },[locationForegroundPermission]);
+
+
+    if(!locationForegroundPermission?.granted){
+      return (
+        <Container>
+          <CheckOutInHeader title='Departure'/>
+          <Message>
+            Please go to settings, Apps, select IgniteFleet, Location, Grant permission and mark Ask every time,
+            so the MAP can be displayed on your screen. 
+          </Message>
+        </Container>
+      )
+    }
+
+    if(isLoadingLocation){
+      return (<Loading />)
+    }
   return (
     <Container>
       <CheckOutInHeader title="Pick Up" />

@@ -28,6 +28,7 @@ export const SignIn = ()=>{
             setIsAuthenticating(true);
 
             const { idToken } =  await GoogleSignin.signIn();
+            // console.log(idToken, 'sou o id token')
         
             if(idToken){
 
