@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState , useEffect } from "react";
 import { Alert } from "react-native";
 import {
   Container,
@@ -7,6 +7,7 @@ import {
   LicensePlate,
   Footer,
   Description,
+  AsyncMessage,
 } from "./styles";
 import { CheckOutInHeader } from "../../components/CheckOutInHeader";
 import { Button } from "../../components/Button";
@@ -18,6 +19,8 @@ import { useObject, useRealm } from "../../libs/realm";
 import { Historic } from "../../libs/realm/schemas/Historic";
 import { BSON } from "realm";
 
+import { getLastSyncTimestamp } from "../../libs/storage/sync";
+
 type ArrivalRouteParams = {
   historic_id: string;
 };
@@ -27,6 +30,7 @@ export const Arrival = () => {
   const { historic_id } = routes.params as ArrivalRouteParams;
   const realm = useRealm();
   const { goBack } = useNavigation();
+  const [ dataNotSynced, setDataNotSynced ] = useState(false);
 
   // const id = new BSON.UUID(historic_id)
   // console.log(Object.prototype.toString.call(id), 'linha25') // object Object
@@ -80,6 +84,7 @@ export const Arrival = () => {
       );
       goBack();
     } catch (error) {
+  
       console.log(error);
       Alert.alert(
         "Error",
@@ -87,6 +92,12 @@ export const Arrival = () => {
       );
     }
   };
+
+  useEffect(()=>{
+    getLastSyncTimestamp()
+    .then(lastSync => setDataNotSynced(lastSync! < vehicleHistory!.updated_at.getTime()))
+ 
+  },[])
 
   return (
     <Container>
@@ -109,6 +120,12 @@ export const Arrival = () => {
           />
         </Footer>
       )}
+    { dataNotSynced &&
+      <AsyncMessage>
+        Synchronization of {vehicleHistory?.status === "departure" ? "departure": "Arrival"} pending.
+      </AsyncMessage>
+    
+    }
     </Container>
   );
 };
