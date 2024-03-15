@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
 import { Image } from 'expo-image';
-import { Power } from 'phosphor-react-native';
+
 
 export const Container = styled.View`
   flex-direction: row;
