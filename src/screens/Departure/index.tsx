@@ -8,15 +8,20 @@ import { LicensePlateInput } from '../../components/LicensePlateInput';
 import { DescriptionArea } from '../../components/DescriptionArea';
 import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
+import { LocationInfo } from '../../components/LocationInfo';
+
 import { licensePlateValidation } from '../../utils/licensePlateValidation';
 import { getAddressLocation } from '../../utils/getAddressLocation';
 
 import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { useUser } from '@realm/react';
+
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useForegroundPermissions, watchPositionAsync, LocationAccuracy, LocationSubscription } from 'expo-location';
+import { Car } from 'phosphor-react-native';
+import MapView from 'react-native-maps';
 
 
 
@@ -25,6 +30,7 @@ export function Departure() {
   const [ description, setDescription ] = useState('');
   const [ isRegistering, setIsRegistering ] = useState(false);
   const [ isLoadingLocation, setIsLoadingLocation ] = useState(true);
+  const [ currentAddress, setCurrentAddress ]  =  useState<null| string>(null);
   
   const [locationForegroundPermission, requestLocationForegroundPermission ] = useForegroundPermissions();
 
@@ -91,10 +97,12 @@ export function Departure() {
         accuracy: LocationAccuracy.High,
         timeInterval: 1000
       }, (location)=>{
-        console.log(location.coords.longitude)
         getAddressLocation(location.coords)
         .then((address)=> {
-          console.log(address)
+         if(address){
+          setCurrentAddress(address);
+
+         }
         })
         .finally(()=> setIsLoadingLocation(false)); 
       })
@@ -126,12 +134,23 @@ export function Departure() {
     if(isLoadingLocation){
       return (<Loading />)
     }
+
   return (
     <Container>
       <CheckOutInHeader title="Pick Up" />
       <KeyboardAwareScrollView extraHeight={100}>
           <ScrollView>
             <Content>
+            {
+              currentAddress && 
+              <LocationInfo 
+                icon={Car}
+                label='Current Location' 
+                description={currentAddress}
+              
+                />
+
+            }
               <LicensePlateInput
                 ref={licensePlateRef}
                 value={licensePlate}
