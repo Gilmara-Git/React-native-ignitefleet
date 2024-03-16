@@ -1,4 +1,9 @@
 #import "AppDelegate.h"
+// @generated begin react-native-maps-import - expo prebuild (DO NOT MODIFY) sync-f2f83125c99c0d74b42a2612947510c4e08c423a
+#if __has_include(<GoogleMaps/GoogleMaps.h>)
+#import <GoogleMaps/GoogleMaps.h>
+#endif
+// @generated end react-native-maps-import
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
@@ -7,6 +12,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+// @generated begin react-native-maps-init - expo prebuild (DO NOT MODIFY) sync-a5a8159dc5c996704001ed4294b580d39b03f786
+#if __has_include(<GoogleMaps/GoogleMaps.h>)
+  [GMSServices provideAPIKey:@"AIzaSyBenTzd0KhBI2T84v-9bjAOqqnFZgJTgbc"];
+#endif
+// @generated end react-native-maps-init
   self.moduleName = @"main";
 
   // You can add your custom initial props in the dictionary below.
