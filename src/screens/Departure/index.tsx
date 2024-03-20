@@ -9,6 +9,7 @@ import { DescriptionArea } from '../../components/DescriptionArea';
 import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
 import { LocationInfo } from '../../components/LocationInfo';
+import { Map } from '../../components/Map';
 
 import { licensePlateValidation } from '../../utils/licensePlateValidation';
 import { getAddressLocation } from '../../utils/getAddressLocation';
@@ -16,12 +17,19 @@ import { getAddressLocation } from '../../utils/getAddressLocation';
 import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { useUser } from '@realm/react';
+import { Car } from 'phosphor-react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import { useForegroundPermissions, watchPositionAsync, LocationAccuracy, LocationSubscription } from 'expo-location';
-import { Car } from 'phosphor-react-native';
-import MapView from 'react-native-maps';
+import { 
+  useForegroundPermissions, 
+  watchPositionAsync, 
+  LocationAccuracy, 
+  LocationSubscription, 
+  LocationObjectCoords } 
+  from 'expo-location';
+  
+
 
 
 
@@ -30,8 +38,9 @@ export function Departure() {
   const [ description, setDescription ] = useState('');
   const [ isRegistering, setIsRegistering ] = useState(false);
   const [ isLoadingLocation, setIsLoadingLocation ] = useState(true);
-  const [ currentAddress, setCurrentAddress ]  =  useState<null| string>(null);
-  
+  const [ currentAddress, setCurrentAddress ]  =  useState<string|null>(null);
+  const [ currentCoords, setCurrentCoords ] = useState<LocationObjectCoords | null>(null);
+
   const [locationForegroundPermission, requestLocationForegroundPermission ] = useForegroundPermissions();
 
     const descriptionAreaRef = useRef<TextInput>(null);
@@ -97,9 +106,11 @@ export function Departure() {
         accuracy: LocationAccuracy.High,
         timeInterval: 1000
       }, (location)=>{
+        setCurrentCoords(location.coords)
         getAddressLocation(location.coords)
         .then((address)=> {
          if(address){
+
           setCurrentAddress(address);
 
          }
@@ -140,46 +151,58 @@ export function Departure() {
       <CheckOutInHeader title="Pick Up" />
       <KeyboardAwareScrollView extraHeight={100}>
           <ScrollView>
-            <Content>
-            {
-              currentAddress && 
-              <LocationInfo 
-                icon={Car}
-                label='Current Location' 
-                description={currentAddress}
-              
-                />
 
+            { currentCoords && 
+                  <Map coordinates={[
+                    {latitude: 37.3217, longitude: -122.0414 },
+                    {latitude: 37.2692, longitude: -122.0126},
+                    {latitude: 37.2867, longitude: -121.9343},
+                    {latitude: 37.3512, longitude: -121.9892},
+                    {latitude: 37.3402, longitude: -122.0867},
+                  ]}/>
+            
             }
-              <LicensePlateInput
-                ref={licensePlateRef}
-                value={licensePlate}
-                onChangeText={setLicensePlate}
-                label="License Plate"
-                placeholder="USY8L97"
-                onSubmitEditing={() => descriptionAreaRef.current?.focus()}
-                returnKeyType="next"
-              />
-              
 
-              <DescriptionArea
-                ref={descriptionAreaRef}
-                value={description}
-                onChangeText={setDescription}
-                label="Purpose"
-                placeholder="I will use this car for ..."
-                onSubmitEditing={handleCarPickUp}
-                returnKeyType="next"
-                blurOnSubmit={true}
-              />
-            
-          
-            
-              <Button 
-                title="Register Pick up" 
-                onPress={handleCarPickUp}
-                isLoading={isRegistering}
-                />
+            <Content>
+                {
+                  currentAddress && 
+                  <LocationInfo 
+                    icon={Car}
+                    label='Current Location' 
+                    description={currentAddress}
+                  
+                    />
+
+                }
+                  <LicensePlateInput
+                    ref={licensePlateRef}
+                    value={licensePlate}
+                    onChangeText={setLicensePlate}
+                    label="License Plate"
+                    placeholder="USY8L97"
+                    onSubmitEditing={() => descriptionAreaRef.current?.focus()}
+                    returnKeyType="next"
+                  />
+                  
+
+                  <DescriptionArea
+                    ref={descriptionAreaRef}
+                    value={description}
+                    onChangeText={setDescription}
+                    label="Purpose"
+                    placeholder="I will use this car for ..."
+                    onSubmitEditing={handleCarPickUp}
+                    returnKeyType="next"
+                    blurOnSubmit={true}
+                  />
+                
+              
+                
+                  <Button 
+                    title="Register Pick up" 
+                    onPress={handleCarPickUp}
+                    isLoading={isRegistering}
+                    />
             </Content>
             </ScrollView>
       </KeyboardAwareScrollView>
