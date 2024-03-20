@@ -6,6 +6,7 @@ export const getAddressLocation = async ({
 }: LocationObjectCoords) => {
   try {
     const addressResponse = await reverseGeocodeAsync({ latitude, longitude });
+    
 
     return `${addressResponse[0]?.street} , ${addressResponse[0].city}`;
   } catch (error) {
