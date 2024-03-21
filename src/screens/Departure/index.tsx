@@ -1,5 +1,6 @@
 import React , { useState , useRef, useEffect  } from 'react';
 import { TextInput, ScrollView, Alert } from 'react-native';
+import { Car } from 'phosphor-react-native';
 
 import { Container, Content , Message } from './styles';
 
@@ -17,7 +18,6 @@ import { getAddressLocation } from '../../utils/getAddressLocation';
 import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
 import { useUser } from '@realm/react';
-import { Car } from 'phosphor-react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
@@ -32,6 +32,8 @@ import {
 } 
   from 'expo-location';
   
+
+  import { startLocationTask } from '../../tasks/backgroundLocationTask'; 
 
 export const Departure= () =>{
   const [ licensePlate, setLicensePlate ] = useState('');
@@ -79,6 +81,7 @@ export const Departure= () =>{
 
        }
     
+       await startLocationTask();
 
         realm.write(()=> {
           realm.create('Historic', Historic.generate({ 

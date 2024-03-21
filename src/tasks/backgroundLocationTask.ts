@@ -15,9 +15,9 @@ TaskManager.defineTask(BACKGROUND_TASK_NAME, ({ data, error }: any) => {
     }
 
     if (data) {
-      console.log("DATA => ", data);
-      const { locations } = data;
-      console.log("LOCATION => ", locations);
+      // console.log("DATA => ", data);
+      // const { locations } = data;
+      // console.log("LOCATION => ", locations);
 
       const { coords, timestamp } = data.locations[0];
 
@@ -55,6 +55,7 @@ export const startLocationTask = async () => {
 };
 
 export const stopLocationTask = async () => {
+
   try {
     const hasTaskStarted = await hasStartedLocationUpdatesAsync(
       BACKGROUND_TASK_NAME

@@ -20,6 +20,7 @@ import { Historic } from "../../libs/realm/schemas/Historic";
 import { BSON } from "realm";
 
 import { getLastSyncTimestamp } from "../../libs/storage/sync";
+import { stopLocationTask } from "../../tasks/backgroundLocationTask";
 
 type ArrivalRouteParams = {
   historic_id: string;
@@ -65,7 +66,7 @@ export const Arrival = () => {
     goBack();
   };
 
-  const handleArrivalRegistration = () => {
+  const handleArrivalRegistration = async() => {
     try {
       if (!vehicleHistory) {
         return Alert.alert(
@@ -73,6 +74,9 @@ export const Arrival = () => {
           "Could not retrieve the vehicle information from the database. Please try again"
         );
       }
+      await stopLocationTask();
+
+      
       realm.write(() => {
         vehicleHistory.status = "arrival";
         vehicleHistory.updated_at = new Date();
@@ -82,6 +86,8 @@ export const Arrival = () => {
         "Arrival",
         "Your vehicle arrival was successfully registered."
       );
+
+
       goBack();
     } catch (error) {
   
