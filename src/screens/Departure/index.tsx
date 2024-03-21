@@ -23,10 +23,13 @@ import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { 
   useForegroundPermissions, 
+  requestBackgroundPermissionsAsync,
   watchPositionAsync, 
   LocationAccuracy, 
   LocationSubscription, 
-  LocationObjectCoords } 
+  LocationObjectCoords,
+  
+} 
   from 'expo-location';
   
 
@@ -48,7 +51,7 @@ export const Departure= () =>{
     const { goBack} = useNavigation();
    
 
-    const handleDepartureRegister = () =>{
+    const handleDepartureRegister = async () =>{
 
       try{
         if(!licensePlateValidation(licensePlate)){
@@ -65,7 +68,16 @@ export const Departure= () =>{
         if(!currentCoords?.latitude && !currentCoords?.longitude){
           return Alert.alert('Location','It was not possible to retrieve current location. Try again.')
         }
-        setIsRegistering;(true)
+        setIsRegistering;(true);
+
+        const backgroundPermissions = await requestBackgroundPermissionsAsync();
+       if(!backgroundPermissions.granted){
+        setIsRegistering(false);
+
+        return Alert.alert('Location',
+        'This App needs access to background location at all times. Please go to settings, Apps, igniteFleet, Permission, Location and "Allow all the time."');
+
+       }
     
 
         realm.write(()=> {
@@ -91,7 +103,7 @@ export const Departure= () =>{
     };
 
     useEffect(()=>{
-      requestLocationForegroundPermission()
+      requestLocationForegroundPermission();
     },[]);
     
     useEffect(()=>{
