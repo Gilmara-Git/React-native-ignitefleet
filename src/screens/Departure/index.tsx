@@ -30,10 +30,7 @@ import {
   from 'expo-location';
   
 
-
-
-
-export function Departure() {
+export const Departure= () =>{
   const [ licensePlate, setLicensePlate ] = useState('');
   const [ description, setDescription ] = useState('');
   const [ isRegistering, setIsRegistering ] = useState(false);
@@ -51,7 +48,7 @@ export function Departure() {
     const { goBack} = useNavigation();
    
 
-    const handleCarPickUp = () =>{
+    const handleDepartureRegister = () =>{
 
       try{
         if(!licensePlateValidation(licensePlate)){
@@ -64,6 +61,10 @@ export function Departure() {
           return Alert.alert('Inform Purpose','Explain the reason you need this car.')
         }
         
+
+        if(!currentCoords?.latitude && !currentCoords?.longitude){
+          return Alert.alert('Location','It was not possible to retrieve current location. Try again.')
+        }
         setIsRegistering;(true)
     
 
@@ -153,13 +154,7 @@ export function Departure() {
           <ScrollView>
 
             { currentCoords && 
-                  <Map coordinates={[
-                    {latitude: 37.3217, longitude: -122.0414 },
-                    {latitude: 37.2692, longitude: -122.0126},
-                    {latitude: 37.2867, longitude: -121.9343},
-                    {latitude: 37.3512, longitude: -121.9892},
-                    {latitude: 37.3402, longitude: -122.0867},
-                  ]}/>
+                  <Map coordinates={[currentCoords]}/>
             
             }
 
@@ -191,7 +186,7 @@ export function Departure() {
                     onChangeText={setDescription}
                     label="Purpose"
                     placeholder="I will use this car for ..."
-                    onSubmitEditing={handleCarPickUp}
+                    onSubmitEditing={handleDepartureRegister}
                     returnKeyType="next"
                     blurOnSubmit={true}
                   />
@@ -200,7 +195,7 @@ export function Departure() {
                 
                   <Button 
                     title="Register Pick up" 
-                    onPress={handleCarPickUp}
+                    onPress={handleDepartureRegister}
                     isLoading={isRegistering}
                     />
             </Content>
