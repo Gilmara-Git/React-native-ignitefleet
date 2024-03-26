@@ -9,10 +9,11 @@ import {
   Description,
   AsyncMessage,
 } from "./styles";
-import { CheckOutInHeader } from "../../components/CheckOutInHeader";
+import { X } from "phosphor-react-native";
+
 import { Button } from "../../components/Button";
 import { ButtonIcon } from "../../components/ButtonIcon";
-import { X } from "phosphor-react-native";
+import { CheckOutInHeader } from "../../components/CheckOutInHeader";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 import { useObject, useRealm } from "../../libs/realm";
@@ -21,6 +22,10 @@ import { BSON } from "realm";
 
 import { getLastSyncTimestamp } from "../../libs/storage/sync";
 import { stopLocationTask } from "../../tasks/backgroundLocationTask";
+
+import { getStorageLocationCoords }  from '../../libs/storage/locationCoordsStorage';
+import { LatLng  } from "react-native-maps";
+import { Map } from "../../components/Map";
 
 type ArrivalRouteParams = {
   historic_id: string;
@@ -32,6 +37,9 @@ export const Arrival = () => {
   const realm = useRealm();
   const { goBack } = useNavigation();
   const [ dataNotSynced, setDataNotSynced ] = useState(false);
+  const [ coordinatesFromStorage, setCoordinatesFromStorage  ] = useState<LatLng[]>([]);
+
+
 
   // const id = new BSON.UUID(historic_id)
   // console.log(Object.prototype.toString.call(id), 'linha25') // object Object
@@ -57,11 +65,13 @@ export const Arrival = () => {
     ]);
   };
 
-  const handleRemoveRecordFromDataBase = () => {
+  const handleRemoveRecordFromDataBase = async() => {
     // client is cancelling the pick up, remove record from database
     realm.write(() => {
       realm.delete(vehicleHistory);
     });
+
+    await stopLocationTask()
 
     goBack();
   };
@@ -74,13 +84,14 @@ export const Arrival = () => {
           "Could not retrieve the vehicle information from the database. Please try again"
         );
       }
-      await stopLocationTask();
-
       
       realm.write(() => {
         vehicleHistory.status = "arrival";
         vehicleHistory.updated_at = new Date();
       });
+      
+      await stopLocationTask();
+    
 
       Alert.alert(
         "Arrival",
@@ -99,16 +110,41 @@ export const Arrival = () => {
     }
   };
 
+  const getInfoLocation = async()=>{
+    
+    // this prevents to get to an error to retrieve the updated_at
+    
+    if(!vehicleHistory){
+      return;
+    }
+
+
+    const lastSync = await getLastSyncTimestamp();
+    const updated_at =  vehicleHistory!.updated_at.getTime();
+    setDataNotSynced(updated_at > lastSync!);
+
+      
+    const coords =  await getStorageLocationCoords();
+  
+    setCoordinatesFromStorage(coords);
+  };
+
   useEffect(()=>{
-    getLastSyncTimestamp()
-    .then(lastSync => setDataNotSynced(lastSync! < vehicleHistory!.updated_at.getTime()))
+    getInfoLocation ();
  
-  },[])
+  },[vehicleHistory])
 
   return (
     <Container>
       <CheckOutInHeader title={headerTitle} />
+
+        { coordinatesFromStorage.length > 0  && 
+          <Map coordinates={coordinatesFromStorage}/> 
+        }
+
       <Content>
+
+
         <Label>License Plate</Label>
 
         <LicensePlate>{vehicleHistory?.license_plate}</LicensePlate>
