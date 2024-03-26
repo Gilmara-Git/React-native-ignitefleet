@@ -27,8 +27,7 @@ import {
   watchPositionAsync, 
   LocationAccuracy, 
   LocationSubscription, 
-  LocationObjectCoords,
-  
+  LocationObjectCoords, 
 } 
   from 'expo-location';
   
@@ -110,14 +109,12 @@ export const Departure= () =>{
     },[]);
     
     useEffect(()=>{
-
       if(!locationForegroundPermission?.granted){
         return;
       }
 
       let subscription: LocationSubscription = { remove: ()=>{}} ;
    
-
       watchPositionAsync({
         accuracy: LocationAccuracy.High,
         timeInterval: 1000

@@ -6,13 +6,14 @@ import { useUser } from "@realm/react";
 import { Historic } from "../../libs/realm/schemas/Historic";
 import { useQuery, useRealm } from "../../libs/realm";
 import { Realm } from '@realm/react';
+// import Realm from 'realm'
 
 import { Header } from "../../components/Header";
 import { CarStatus } from "../../components/CarStatus";
+import { TopMessage } from '../../components/TopMessage';
 import { HistoricCard , HistoricCardProps } from "../../components/HistoricCard";
 import { saveLastSyncTimestamp, getLastSyncTimestamp } from "../../libs/storage/sync";
 import Toast from 'react-native-toast-message';
-import { TopMessage } from '../../components/TopMessage';
 
 import dayjs from "dayjs";
 import { CloudArrowUp } from "phosphor-react-native";
@@ -20,27 +21,27 @@ import { CloudArrowUp } from "phosphor-react-native";
 
 export const Home = () => {
   const [vehicleInUse, setVehicleInUse] = useState<Historic | null>(null);
-  const  [ vehiclesReturned, setVehiclesReturned ] = useState<HistoricCardProps[]>([]);
+  const  [ vehicleHistoric, setVehicleHistoric ] = useState<HistoricCardProps[]>([]);
   const  [percentageToSync, setPercentageToSync ] = useState<string | null>(null);
-
-
+ 
   const { navigate } = useNavigation();
 
   const realm = useRealm();
   const user = useUser();
   const historic = useQuery(Historic);
 
-  const fetchHistoricOfCarInUse = () => {
+
+  const fetchVehicleInUse = () => {
     try {
       const vehicle = historic.filtered("status = 'departure'")[0];
       setVehicleInUse(vehicle);
     } catch (error) {
       console.log(error);
-      // Alert.alert("Alert", "No vehicle in use found.");
+      Alert.alert("Alert", "No vehicle in use found.");
     }
   };
 
-  const handleMovement = () => {
+  const handleRegisterMovement = () => {
     if (vehicleInUse?._id) {
       navigate("arrival", { historic_id: vehicleInUse._id.toString() });
     } else {
@@ -48,26 +49,32 @@ export const Home = () => {
     }
   };
 
-  const fetchVehicleUsageHistoric = async() => {
+  const fetchHistoric = async() => {
 
     try{
-      const lastTimeDataSynced = await getLastSyncTimestamp();
+      
+      if(!realm.isClosed) {
+        
+          const lastTimeDataSynced = await getLastSyncTimestamp();
 
-      const historicList = historic.filtered(
-        "status = 'arrival' SORT(created_at DESC)"
-      );
-  
-      const formattedUsedVehicles = historicList.map((item)=>{ 
-          return {
-          id: item._id.toString(),
-          licensePlate: item.license_plate,
-          created: dayjs(item.created_at).format('[Departured on] MM-DD-YYYY [at] hh:mm A'),
-          isSynced: item.updated_at.getTime() < lastTimeDataSynced!
-        }
-  
-      });
-      setVehiclesReturned(formattedUsedVehicles);
+        const historicList = historic.filtered(
+          "status = 'arrival' SORT(created_at DESC)"
+        );
     
+        const formattedUsedVehicles = historicList.map((item)=>{ 
+            return {
+            id: item._id.toString(),
+            licensePlate: item.license_plate,
+            created: dayjs(item.created_at).format('[Departured on] MM-DD-YYYY [at] hh:mm A'),
+            isSynced: item.updated_at.getTime() < lastTimeDataSynced!
+          
+          }
+    
+        });
+        setVehicleHistoric(formattedUsedVehicles);
+      
+      }
+
     }catch(error){
       
       console.log(error);
@@ -80,13 +87,14 @@ export const Home = () => {
   };
 
   const progressNotification = async (transferred: number, transferable: number)=>{
+
     //doc shows this way
     const percentTransferred = 
     parseFloat((transferred / transferable).toFixed(2)) * 100;
 
     if(percentTransferred === 100){
       await saveLastSyncTimestamp();
-      await fetchVehicleUsageHistoric();
+      await fetchHistoric();
       setPercentageToSync(null);
 
       Toast.show({
@@ -104,23 +112,24 @@ export const Home = () => {
   }
 
   useEffect(() => {
-    fetchVehicleUsageHistoric();
+    console.log('Is Realm closed ?', realm.isClosed, )
+    fetchHistoric();
   }, [historic]);
 
   useEffect(() => {
-    fetchHistoricOfCarInUse();
-  }, [historic]);
+    fetchVehicleInUse();
+  }, []);
 
   useEffect(() => {
     try {
-      realm.addListener("change", () => fetchHistoricOfCarInUse());
+      realm.addListener("change", () => fetchVehicleInUse());
     } catch (error) {
       `An exception was throw within the change listener: ${error}.`;
     }
 
     return () => {
       if(realm && !realm.isClosed) {
-        realm.removeListener("change", fetchHistoricOfCarInUse);
+        realm.removeListener("change", fetchVehicleInUse);
       }
     };
   }, []);
@@ -129,14 +138,15 @@ export const Home = () => {
 useEffect(()=>{
   realm.subscriptions.update((mutableSubs, realm)=>{
     const historicByUserQuery = realm.objects('Historic').filtered(`user_id =  '${user!.id}'`);
-
     mutableSubs.add(historicByUserQuery, {name: 'historic_by_user'});
+
   })
 
 },[realm]);
 
 useEffect(()=>{
   const syncSession = realm.syncSession;
+
   
   if(!syncSession){
     return
@@ -161,7 +171,7 @@ useEffect(()=>{
       <Header />
       <Content>
         <CarStatus
-          onPress={handleMovement}
+          onPress={handleRegisterMovement}
           licensePlate={vehicleInUse?.license_plate}
         />
 
@@ -170,7 +180,7 @@ useEffect(()=>{
         <FlatList 
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100}}
-            data={vehiclesReturned}
+            data={vehicleHistoric}
             keyExtractor={item => item.id}
             renderItem={({item})=> (
               <HistoricCard 

@@ -19,6 +19,7 @@ export const getStorageLocationCoords = async()=>{
 };
 
 export const saveStorageLocationCoords = async(newLocation: LocationProps)=>{
+   
     const coordsList  = await getStorageLocationCoords();
 
     coordsList.push(newLocation);
