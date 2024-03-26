@@ -1,10 +1,12 @@
 import { Realm } from '@realm/react';
 import { ObjectSchema } from 'realm';
+import { CoordsSchemaProps } from './Coords';
 
 type GenerateProps = {
     user_id:string;
     license_plate:string;
-    description:string
+    description:string;
+    coords: CoordsSchemaProps[];
 }
 
 export class Historic extends Realm.Object<Historic> {
@@ -15,10 +17,11 @@ export class Historic extends Realm.Object<Historic> {
     status!: string;
     created_at!: Date;
     updated_at!: Date;
+    coords!: CoordsSchemaProps[]
 
 
 
-    static generate({ user_id, license_plate, description }: GenerateProps){
+    static generate({ user_id, license_plate, description, coords }: GenerateProps){
         return {
             _id: new Realm.BSON.UUID(),
             user_id,
@@ -26,7 +29,8 @@ export class Historic extends Realm.Object<Historic> {
             description,
             status: 'departure',
             created_at: new Date(),
-            updated_at: new Date()
+            updated_at: new Date(),
+            coords
 
         }
 
@@ -46,7 +50,11 @@ export class Historic extends Realm.Object<Historic> {
             description: 'string',
             status: 'string',
             created_at: 'date',
-            updated_at: 'date'
+            updated_at: 'date',
+            coords:{
+                type: 'list',
+                objectType: 'Coords'
+            }
         }
     }
 
