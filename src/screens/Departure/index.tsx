@@ -86,7 +86,14 @@ export const Departure= () =>{
           realm.create('Historic', Historic.generate({ 
             user_id: user!.id, 
             license_plate: licensePlate, 
-            description}) 
+            description,
+           coords: [{ 
+            longitude: currentCoords.longitude,
+            latitude: currentCoords.latitude,
+            timestamp: new Date().getTime()
+          }]
+          
+          }) 
             );
         });
 
