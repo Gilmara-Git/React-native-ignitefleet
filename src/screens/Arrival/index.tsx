@@ -37,7 +37,7 @@ export const Arrival = () => {
   const realm = useRealm();
   const { goBack } = useNavigation();
   const [ dataNotSynced, setDataNotSynced ] = useState(false);
-  const [ coordinatesFromStorage, setCoordinatesFromStorage  ] = useState<LatLng[]>([]);
+  const [ coordinates, setCoordinates  ] = useState<LatLng[]>([]);
 
 
 
@@ -85,9 +85,13 @@ export const Arrival = () => {
         );
       }
       
+      const locationsFromAsyncStorage = await getStorageLocationCoords();
+
+
       realm.write(() => {
         vehicleHistory.status = "arrival";
         vehicleHistory.updated_at = new Date();
+        vehicleHistory.coords.push(...locationsFromAsyncStorage)    
       });
       
       await stopLocationTask();
@@ -123,10 +127,21 @@ export const Arrival = () => {
     const updated_at =  vehicleHistory!.updated_at.getTime();
     setDataNotSynced(updated_at > lastSync!);
 
-      
-    const coords =  await getStorageLocationCoords();
-  
-    setCoordinatesFromStorage(coords);
+      if(vehicleHistory?.status === 'departure'){
+        const coords =  await getStorageLocationCoords();
+        setCoordinates(coords);
+
+      }else{
+        const coordsFromDB =  vehicleHistory?.coords.map((coord)=>{
+          return {
+            latitude: coord.latitude,
+            longitude: coord.longitude,
+            timestamp: coord.timestamp
+          }
+        })
+
+        setCoordinates(coordsFromDB ?? [])
+      }
   };
 
   useEffect(()=>{
@@ -138,8 +153,8 @@ export const Arrival = () => {
     <Container>
       <CheckOutInHeader title={headerTitle} />
 
-        { coordinatesFromStorage.length > 0  && 
-          <Map coordinates={coordinatesFromStorage}/> 
+        { coordinates.length > 0  && 
+          <Map coordinates={coordinates}/> 
         }
 
       <Content>
