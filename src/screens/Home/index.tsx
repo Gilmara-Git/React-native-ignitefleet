@@ -112,7 +112,7 @@ export const Home = () => {
   }
 
   useEffect(() => {
-    console.log('Is Realm closed ?', realm.isClosed, )
+
     fetchHistoric();
   }, [historic]);
 

@@ -49,7 +49,7 @@ export const Departure= () =>{
 
     const realm = useRealm();
     const user = useUser();
-    const { goBack} = useNavigation();
+    const { navigate } = useNavigation();
    
 
     const handleDepartureRegister = async () =>{
@@ -98,7 +98,7 @@ export const Departure= () =>{
         });
 
         Alert.alert('Congratulations','Car pick up was successfully registered.');
-        goBack();
+        navigate('home');
         
 
        }catch(error){
