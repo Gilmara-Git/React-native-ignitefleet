@@ -24,5 +24,5 @@ export const {
     useObject
 } =  createRealmContext({
     schema: [Historic, Coords],
-    schemaVersion: 1
+    schemaVersion: 0
 });
