@@ -1,9 +1,9 @@
-import { reverseGeocodeAsync, LocationObjectCoords } from "expo-location";
-
+import { reverseGeocodeAsync } from "expo-location";
+import { LatLng } from "react-native-maps";
 export const getAddressLocation = async ({
   latitude,
   longitude,
-}: LocationObjectCoords) => {
+}: LatLng) => {
   try {
     const addressResponse = await reverseGeocodeAsync({ latitude, longitude });
     
