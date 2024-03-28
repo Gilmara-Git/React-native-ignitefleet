@@ -27,7 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.gilmarapq.ignitefleet</string>
+          <string>com.googleusercontent.apps.140587143092-veeii9pfhpin345dato0uguddh41r9l3</string>
         </array>
       </dict>
       <dict>
@@ -41,6 +41,8 @@
     <string>1</string>
     <key>GIDClientID</key>
     <string>140587143092-veeii9pfhpin345dato0uguddh41r9l3.apps.googleusercontent.com</string>
+    <key>GMSApiKey</key>
+    <string>AIzaSyBenTzd0KhBI2T84v-9bjAOqqnFZgJTgbc</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
@@ -56,6 +58,10 @@
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <key>UIBackgroundModes</key>
+    <array>
+      <string>location</string>
+    </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

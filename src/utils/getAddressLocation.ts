@@ -1,14 +1,15 @@
-import { reverseGeocodeAsync, LocationObjectCoords  } from "expo-location";
+import { reverseGeocodeAsync } from "expo-location";
+import { LatLng } from "react-native-maps";
+export const getAddressLocation = async ({
+  latitude,
+  longitude,
+}: LatLng) => {
+  try {
+    const addressResponse = await reverseGeocodeAsync({ latitude, longitude });
+    
 
-export const getAddressLocation = async( {latitude, longitude}: LocationObjectCoords )=>{
-
-    try{
-       const addressResponse =  await reverseGeocodeAsync({latitude, longitude});
-        console.log(addressResponse, 'sou o address response')
-        return  `${addressResponse[0]?.street} , ${addressResponse[0].city}`;
-
-
-    }catch(error){
-        console.log(error)
-    }
-}
+    return `${addressResponse[0]?.street} , ${addressResponse[0].city}`;
+  } catch (error) {
+    console.log(error);
+  }
+};
