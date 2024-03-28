@@ -21,6 +21,7 @@ TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }: any) => {
       // console.log("LOCATION => ", locations);
 
       const { coords, timestamp } = data.locations[0];
+      console.log('Has task started?', coords, timestamp, new Date(timestamp) )
 
       const currentLocation = {
         latitude: coords.latitude,
