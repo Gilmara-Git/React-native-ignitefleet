@@ -2,7 +2,7 @@ import React , { useState , useRef, useEffect  } from 'react';
 import { TextInput, ScrollView, Alert } from 'react-native';
 import { Car } from 'phosphor-react-native';
 
-import { Container, Content , Message } from './styles';
+import { Container, Content , Message, MessageContent } from './styles';
 
 import { CheckOutInHeader } from '../../components/CheckOutInHeader';
 import { LicensePlateInput } from '../../components/LicensePlateInput';
@@ -14,6 +14,7 @@ import { Map } from '../../components/Map';
 
 import { licensePlateValidation } from '../../utils/licensePlateValidation';
 import { getAddressLocation } from '../../utils/getAddressLocation';
+import { openSettings } from '../../utils/openSettings';
 
 import { useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
@@ -76,7 +77,14 @@ export const Departure= () =>{
         setIsRegistering(false);
 
         return Alert.alert('Location',
-        'This App needs access to background location at all times. Please go to settings, Apps, igniteFleet, Permission, Location and "Allow all the time."');
+        'This App needs access to background location at all times. Please go to settings, Apps, igniteFleet, Permission, Location and "Allow all the time."',
+        [
+          { 
+            text: 'Go to settings',
+            onPress: openSettings
+        }
+        ]
+        );
 
        }
     
@@ -154,10 +162,15 @@ export const Departure= () =>{
       return (
         <Container>
           <CheckOutInHeader title='Departure'/>
+          <MessageContent>
           <Message>
             Please go to settings, Apps, select IgniteFleet, Location, Grant permission and mark Ask every time,
             so the MAP can be displayed on your screen. 
           </Message>
+          
+          <Button title='Go to settings' onPress={openSettings} />
+          </MessageContent>
+          
         </Container>
       )
     }

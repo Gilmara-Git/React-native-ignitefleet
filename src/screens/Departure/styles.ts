@@ -12,11 +12,19 @@ export const Content = styled.View`
   margin-top: 16px;
 `;
 
+export const MessageContent = styled.View`
+  flex: 1;
+  padding: 24px;
+  justify-content: center;
+
+`;
+
 export const Message =  styled.Text`
   color: ${({theme})=>theme.COLORS.WHITE};
   font-family: ${({theme})=>theme.FONT_FAMILY.REGULAR};
-  margin-top: 24px;
+ 
   text-align: center;
-  margin: 24px;
+  margin-bottom: 24px;
+
 
 `;
