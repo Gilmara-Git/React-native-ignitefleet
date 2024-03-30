@@ -48,7 +48,6 @@ export const Arrival = () => {
   const [ departure, setDeparture ] = useState<LocationInfoProps>({} as LocationInfoProps);
   const [ arrival, setArrival] = useState<LocationInfoProps| null>(null);
   const [ isLoading, setIsLoading ] = useState(false);
-console.log(dataNotSynced, 'linha51')
   
   // const id = new BSON.UUID(historic_id)
   // console.log(Object.prototype.toString.call(id), 'linha25') // object Object
@@ -161,8 +160,7 @@ console.log(dataNotSynced, 'linha51')
       if(vehicleHistory?.coords[0]){  
         const departureAddress = await getAddressLocation(vehicleHistory?.coords[0]);
         const timeDepartureTimestamp = vehicleHistory?.coords[0].timestamp;
-        console.log(departureAddress, 'departureAddress')
-        
+      
         setDeparture({
           label: `Left from ${departureAddress ?? ''}`,
           description: dayjs(new Date(timeDepartureTimestamp)).format('MM/DD/YYYY [at] hh:mm A')
