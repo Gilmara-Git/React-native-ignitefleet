@@ -17,10 +17,6 @@ import { WifiSlash } from 'phosphor-react-native';
 import { useNetInfo } from "@react-native-community/netinfo";
 
 
-
-
-
-
 // REALM_APP_ID is Application ID inside MongoDB (App Service > Application > App ID)
 import { REALM_APP_ID } from '@env';
 
